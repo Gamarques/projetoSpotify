@@ -1,32 +1,29 @@
 import express from 'express';
-import { db } from '../configs/connect.js';
+import { ArtistModel } from '../models/artists.js';
+import validateId from '../middlewares/validateId.js';
 
 const router = express.Router();
 
-// GET /artists - Buscar todos os artistas
-router.get('/', async (req, res) => {
+// GET /api/artists
+router.get('/', async (req, res, next) => {
     try {
-        const artistsCollection = db.collection("artists");
-        const artists = await artistsCollection.find({}).toArray();
+        const artists = await ArtistModel.findAll();
         res.json(artists);
     } catch (error) {
-        res.status(500).json({ error: "Erro ao buscar artistas" });
+        next(error);
     }
 });
 
-// GET /artists/:id - Buscar um artista específico
-router.get('/:id', async (req, res) => {
+// GET /api/artists/:id
+router.get('/:id', validateId, async (req, res, next) => {
     try {
-        const artistsCollection = db.collection("artists");
-        const artist = await artistsCollection.findOne({ _id: req.params.id });
-        
+        const artist = await ArtistModel.findById(req.params.id);
         if (!artist) {
             return res.status(404).json({ error: "Artista não encontrado" });
         }
-        
         res.json(artist);
     } catch (error) {
-        res.status(500).json({ error: "Erro ao buscar artista" });
+        next(error);
     }
 });
 

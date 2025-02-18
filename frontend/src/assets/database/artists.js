@@ -1,3 +1,6 @@
+
+
+
 export const artistArray = [
     {
       id: 1,
@@ -6,3 +9,4 @@ export const artistArray = [
       banner: "https://i.scdn.co/image/ab67618600001016b37fbcbd078cb239588df5d9",
     },
 ];
+
