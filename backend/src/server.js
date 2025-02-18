@@ -1,10 +1,32 @@
-import app from "./app.js";
-import connect from "./src/configs/connect.js";
-import server from "./src/configs/server.js";
+import connect from "./configs/connect.js";
+import createApp from "./app.js";
+import server from "./configs/server.js";
 
+async function startServer() {
+    try {
+        // Conecta ao banco de dados
+        await connect();
 
-connect();
+        // Cria a aplicação
+        const app = createApp();
 
-app.listen(server.PORT, () => {
-    console.log(`Server is running on port ${server.PORT} in ${server.env} mode`);
+        // Inicia o servidor
+        app.listen(server.PORT, () => {
+            console.log(`Servidor rodando na porta ${server.PORT}`);
+            console.log(`Ambiente: ${server.env}`);
+            console.log(`Frontend URL: ${server.corsOptions.origin}`);
+        });
+
+    } catch (error) {
+        console.error('Erro ao iniciar o servidor:', error);
+        process.exit(1);
+    }
+}
+
+// Tratamento de erros não capturados
+process.on('unhandledRejection', (error) => {
+    console.error('Erro não tratado:', error);
+    process.exit(1);
 });
+
+startServer();

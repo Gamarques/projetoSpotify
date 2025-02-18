@@ -1,12 +1,25 @@
 import express from "express";
 import cors from "cors";
-import routes from "./src/routes/index.js";
-import server from "./src/configs/server.js";   
+import routes from "./routes/index.js";
+import server from "./configs/server.js";   
+import requestLogger from "./middlewares/requestLogger.js"; 
+import errorHandler from "./middlewares/errorHandler.js";
 
-const app = express();
+const createApp = () => {
+    const app = express();
 
-app.use(cors(server.corsOptions));
-app.use(express.json());
-app.use(routes);
+    // Configuração dos middlewares globais
+    app.use(cors(server.corsOptions));
+    app.use(express.json());
+    app.use(requestLogger);
 
-export default app;
+    // Configuração das rotas
+    app.use('/api', routes);
+
+    // Middleware de tratamento de erros
+    app.use(errorHandler);
+
+    return app;
+};
+
+export default createApp;

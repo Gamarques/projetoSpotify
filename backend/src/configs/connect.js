@@ -1,15 +1,17 @@
 import { MongoClient } from "mongodb";
+import server from "./server.js";
 
-const URI = "mongodb+srv://gabrielgamarques1:0o1vHuHGy94rytpn@cluster025.mgwrb.mongodb.net/?retryWrites=true&w=majority&appName=Cluster025";
+const client = new MongoClient(server.mongodb.uri);
 
-const client = new MongoClient(URI);
-
-export const connect = async () => {
+const connect = async () => {
     try {
         await client.connect();
-        console.log("Conectado ao MongoDB");
+        console.log(`Conectado ao MongoDB - Database: ${server.mongodb.dbName}`);
     } catch (error) {
-        console.error("Erro ao conectar ao MongoDB", error);
+        console.error("Erro ao conectar ao MongoDB:", error);
         throw error;
     }
 }   
+
+export default connect;
+export const db = client.db(server.mongodb.dbName);
