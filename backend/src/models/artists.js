@@ -32,3 +32,5 @@ export const ArtistModel = {
         }
     }
 };
+
+export default ArtistModel;
