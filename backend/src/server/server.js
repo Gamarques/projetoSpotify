@@ -5,7 +5,7 @@ import songsRouter from "../routes/songsRoutes.js";
 import artistsRouter from "../routes/artistsRoutes.js";
 import dotenv from "dotenv";
 
-dotenv.config({ path: "../../../config.env" }); // Load environment variables from a .env file into process.env
+dotenv.config(); // Load environment variables from a .env file into process.env
 
 const PORT = process.env.PORT || 5000;
 const app = express();
