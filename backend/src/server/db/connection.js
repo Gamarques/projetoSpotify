@@ -2,7 +2,7 @@
 import { MongoClient, ServerApiVersion } from 'mongodb';
 import dotenv from 'dotenv';
 
-dotenv.config({ path: "./../../../config.env" });
+dotenv.config();
 
 const URI = process.env.MONGODB_URI;
 const DB_NAME = process.env.MONGODB_DB_NAME;

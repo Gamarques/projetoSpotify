@@ -11,8 +11,8 @@ router.get('/', async (req, res) => {
     let collection = await db.collection('artists');
     let results = await collection.find({}).toArray();
     
-    // Adicione um console.log para verificar os resultados
-    console.log("artistas recuperados do banco de dados:", results);
+    // // Adicione um console.log para verificar os resultados
+    // console.log("artistas recuperados do banco de dados:", results);
     
     res.json(results);
   } catch (error) {
