@@ -1,13 +1,22 @@
 import NodeCache from 'node-cache';
-import Artist from '../models/Artist.js'; // Importe o Model de Artista do arquivo correto
-import Song from '../models/Song.js';     // Importe o Model de Música do arquivo correto
+import Artist from '../../models/artists.js'; // Importe o Model de Artista do arquivo correto
+import Song from '../../models/songs.js';     // Importe o Model de Música do arquivo correto
 
 const myCache = new NodeCache({ stdTTL: 3600, checkperiod: 600 });
+
+async function warmupCache() {
+    console.log('Iniciando warmup do cache...');
+    await Promise.all([
+        populateCache('artists', Artist),
+        populateCache('songs', Song)
+    ]);
+    console.log('Warmup do cache concluído');
+}
+
 
 async function populateCache(entityName, model, populateOptions = '') {
     const cacheKey = entityName;
     try {
-        console.log(`Populando/atualizando cache de ${entityName}...`);
         const items = await model.find().populate(populateOptions); // Busca usando os Models Mongoose
         myCache.set(cacheKey, items);
         console.log(`Cache de ${entityName} populado/atualizado.`);
@@ -16,4 +25,4 @@ async function populateCache(entityName, model, populateOptions = '') {
     }
 }
 
-export { populateCache, myCache };
+export { populateCache, myCache, warmupCache };

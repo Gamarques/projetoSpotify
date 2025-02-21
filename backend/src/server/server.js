@@ -4,10 +4,11 @@ import mongoose from 'mongoose'; // Mantenha a importação do Mongoose (pode se
 import { connectToDatabaseMongoose, closeDatabaseConnectionMongoose } from './db/connection.js'; // Importe as funções de conexão de db/connection.js
 import songsRouter from "../routes/songsRoutes.js";
 import artistsRouter from "../routes/artistsRoutes.js";
+import { warmupCache } from "./utils/cacheUtils.js";
 import dotenv from "dotenv";
-import NodeCache from "node-cache";
+// import NodeCache from "node-cache";
 
-const myCache = new NodeCache({ stdTTL: 3600, checkperiod: 600 });
+// const myCache = new NodeCache({ stdTTL: 3600, checkperiod: 600 });
 dotenv.config();
 
 const PORT = process.env.PORT || 5000;
@@ -28,6 +29,7 @@ app.use("/artists", artistsRouter);
 (async () => {
     try {
         await connectToDatabaseMongoose(); // Chama a função para conectar (de db/connection.js)
+        await warmupCache(); // Chama a função para popular o cache (de server/utils/cacheUtils.js)
     } catch (error) {
         console.error('Erro ao conectar ao banco de dados:', error); // Mensagem genérica, pois db/connection.js já loga detalhes de Mongoose
     }
@@ -48,4 +50,4 @@ app.listen(PORT, () => {
     console.log(process.env.PORT);
 });
 
-export { myCache };
+// export { myCache };
