@@ -16,11 +16,11 @@ const songSchema = new Schema({
     required: true
   },
   artist: {  // Mudado de artists (array) para artist (singular)
-    type: Schema.Types.ObjectId,
+    type: String, //se quiser que referecia e funcione como FK, mude para objectID no banco de dados e acione o tipo --> aqi Schema.Types.ObjectId,
     ref: 'Artist',
     required: true
   },
-  audio: {
+  duration: {
     type: String,
     required: true
   }

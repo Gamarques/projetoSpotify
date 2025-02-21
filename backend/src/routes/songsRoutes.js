@@ -1,6 +1,6 @@
 import express from 'express';
-import { myCache } from '../server/server.js';
-import Song from '../models/songs.js' // Importe o Model Song
+import { myCache, populateCache } from '../server/utils/cacheUtils.js' // Ajuste o caminho se necessário
+import Song from '../models/songs.js';
 
 const router = express.Router();
 
@@ -8,21 +8,19 @@ router.get('/', async (req, res) => {
     const cacheKey = 'songs';
     let cachedSongs = myCache.get(cacheKey);
 
-    if (cachedSongs) {
-        console.log('Dados de músicas obtidos do cache (compartilhado - server.js)');
-        return res.json(cachedSongs);
+    if (!cachedSongs) { // Se NÃO estiver no cache, popula
+        console.log('Dados de musicas não encontrados no cache, populando...');
+        await populateCache('songs', Song, 'Artist'); // <--- ADICIONADO populateOptions: 'artist'
+        cachedSongs = myCache.get(cacheKey); // Obtém do cache *agora* populado
+    } else {
+        console.log('Dados de musicas obtidos do cache.');
     }
 
-    try {
-        console.log('Dados de músicas não encontrados no cache (compartilhado - server.js), buscando no banco de dados...');
-        // Use o Model Song.find() para buscar músicas
-        const songs = await Song.find().populate('artist'); // Exemplo com populate para trazer dados do artista
-        myCache.set(cacheKey, songs);
-        console.log('Dados de músicas armazenados no cache (compartilhado - server.js)');
-        res.json(songs);
-    } catch (error) {
-        console.error("Erro ao buscar músicas:", error);
-        res.status(500).json({ error: 'Failed to fetch songs' });
+    if (cachedSongs) {
+        return res.json(cachedSongs);
+    } else { // Se por algum motivo AINDA não houver dados (improvável), trate o erro
+        console.error("Erro ao obter musicas do cache ou banco de dados.");
+        return res.status(500).json({ error: 'Failed to fetch songs' }); // Ou outro tratamento de erro
     }
 });
 
