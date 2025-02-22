@@ -1,26 +1,27 @@
 import express from 'express';
-import { myCache, populateCache } from '../server/utils/cacheUtils.js'; // Importe populateCache e myCache
-import Artist from '../models/artists.js';
+import { myCache } from '../server/utils/cacheUtils.js';   // Importe o cache compartilhado
+import Artist from '../models/artists.js'; // Importe o Model Artist
 
 const router = express.Router();
 
 router.get('/', async (req, res) => {
-    const cacheKey = 'artists';
+    const cacheKey = 'artists_list'; // CHAVE DE CACHE CORRIGIDA!
     let cachedArtists = myCache.get(cacheKey);
 
-    if (!cachedArtists) { // Se NÃO estiver no cache, popula
-        console.log('Dados de artistas não encontrados no cache, populando...');
-        await populateCache('artists', Artist); // Usa a função genérica para popular
-        cachedArtists = myCache.get(cacheKey); // Obtém do cache *agora* populado
-    } else {
-        console.log('Dados de artistas obtidos do cache.');
+    if (cachedArtists) {
+        console.log('Dados de artistas obtidos do cache (artistsRoute.js)'); // LOG CORRIGIDO!
+        return res.json(cachedArtists);
     }
 
-    if (cachedArtists) {
-        return res.json(cachedArtists);
-    } else { // Se por algum motivo AINDA não houver dados (improvável), trate o erro
-        console.error("Erro ao obter artistas do cache ou banco de dados.");
-        return res.status(500).json({ error: 'Failed to fetch artists' }); // Ou outro tratamento de erro
+    try {
+        console.log('Cache miss para artistas (artistsRoute.js), buscando no banco de dados...'); // LOG CORRIGIDO!
+        const artists = await Artist.find();
+        myCache.set(cacheKey, artists);
+        console.log('Dados de artistas armazenados no cache (artistsRoute.js)'); // LOG CORRIGIDO!
+        res.json(artists);
+    } catch (error) {
+        console.error("Erro ao buscar artistas:", error);
+        res.status(500).json({ error: 'Failed to fetch artists' });
     }
 });
 
