@@ -4,12 +4,16 @@ import mongoose from 'mongoose'; // Mantenha a importação do Mongoose (pode se
 import { connectToDatabaseMongoose, closeDatabaseConnectionMongoose } from './db/connection.js'; // Importe as funções de conexão de db/connection.js
 import songsRouter from "../routes/songsRoutes.js";
 import artistsRouter from "../routes/artistsRoutes.js";
-import { warmupCache } from "./utils/cacheUtils.js";
 import dotenv from "dotenv";
+import Artist from "../models/artists.js";
+import Song from "../models/songs.js";
+import { populateCache, myCache, invalidateCache, setupModelChangeListener, warmupCache } from './utils/cacheUtils.js';
+
 // import NodeCache from "node-cache";
 
 // const myCache = new NodeCache({ stdTTL: 3600, checkperiod: 600 });
 dotenv.config();
+
 
 const PORT = process.env.PORT || 5000;
 const app = express();
@@ -45,9 +49,15 @@ process.on('SIGINT', async () => {
     process.exit(0);
 });
 
+// Em server.js (usando setupModelChangeListener com invalidação granular)
+setupModelChangeListener(Artist, 'artists'); // 'artists' como prefixo para chaves de cache de artistas (ex: 'artists_list', 'artists_detail_...')
+setupModelChangeListener(Song, 'songs');   // 'songs' como prefixo para chaves de cache de músicas (ex: 'songs_list', 'songs_detail_...')
+
+
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
     console.log(process.env.PORT);
 });
+
 
 // export { myCache };
