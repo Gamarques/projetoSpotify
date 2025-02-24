@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose, { SchemaType } from 'mongoose';
 // Importa o pacote Mongoose
 const Schema = mongoose.Schema;
 
@@ -11,12 +11,8 @@ const songSchema = new Schema({
     type: String,
     required: false // Opcional, você pode mudar para true se for obrigatório
   },
-  duration: {
-    type: Number,
-    required: true
-  },
   artist: {  // Mudado de artists (array) para artist (singular)
-    type: String, //se quiser que referecia e funcione como FK, mude para objectID no banco de dados e acione o tipo --> aqi Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId, //se quiser que referecia e funcione como FK, mude para objectID no banco de dados e acione o tipo --> aqi Schema.Types.ObjectId,
     ref: 'Artist',
     required: true
   },
