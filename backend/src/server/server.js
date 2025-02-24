@@ -50,8 +50,8 @@ process.on('SIGINT', async () => {
 });
 
 // Em server.js (usando setupModelChangeListener com invalidação granular)
-setupModelChangeListener(Artist, 'artists'); // 'artists' como prefixo para chaves de cache de artistas (ex: 'artists_list', 'artists_detail_...')
-setupModelChangeListener(Song, 'songs');   // 'songs' como prefixo para chaves de cache de músicas (ex: 'songs_list', 'songs_detail_...')
+setupModelChangeListener(Artist, 'artists', ['name', 'image', 'banner']); // Para Artists, campos relevantes: name, image, banner
+setupModelChangeListener(Song, 'songs', ['name', 'image','artist','duration']); // Para Songs, campos relevantes: name, image (SEM banner)
 
 
 app.listen(PORT, () => {
