@@ -1,16 +1,29 @@
-import { useAxios } from 'axios-hooks';
-import { getArtists } from "../services/artistsApi";
+import { useState, useEffect } from 'react';
+import api from '../services/api';
 
 export const useArtistsApi = () => {
-    const [{ data: artists, loading: artistsLoading, error: artistsError }, refetchArtists] = useAxios({
-        url: '/artists', // <-  A URL '/artists' é passada aqui para o useAxios
-        method: 'GET'
-      });
-  
+    const [artists, setArtists] = useState(null);
+    const [artistsLoading, setArtistsLoading] = useState(true);
+    const [artistsError, setArtistsError] = useState(null);
+
+    useEffect(() => {
+        const fetchArtists = async () => {
+            try {
+                const response = await api.get('/artists');
+                setArtists(response.data);
+                setArtistsLoading(false);
+            } catch (error) {
+                setArtistsError(error);
+                setArtistsLoading(false);
+            }
+        };
+
+        fetchArtists();
+    }, []);
+
     return {
-      artists,
-      artistsLoading,
-      artistsError,
-      refetchArtists
+        artists,
+        artistsLoading,
+        artistsError
     };
-  };
+} 

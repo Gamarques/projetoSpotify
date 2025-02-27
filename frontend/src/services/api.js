@@ -35,13 +35,3 @@ api.interceptors.response.use(
 
 
 export default api;
-
-const responseArtist = await api.get("/artists");
-const responseSongs = await api.get("/songs");
-
-export const artistArray = responseArtist.data;
-export const songsArray = responseSongs.data;
-
-
-console.log(artistArray);
-console.log(songsArray);
