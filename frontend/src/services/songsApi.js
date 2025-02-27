@@ -1,12 +1,12 @@
 import api from './api';
 
-
 export const getSongs = async () => {
   try {
-    const response = await apiClient.get('/songs'); // Usa async/await
+    // Corrigido de apiClient para api
+    const response = await api.get('/songs');
     return response.data;
   } catch (error) {
-    throw error;
+    throw new Error('Erro ao buscar música');
   }
 };
 
