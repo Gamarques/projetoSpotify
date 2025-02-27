@@ -3,31 +3,40 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCirclePlay } from "@fortawesome/free-solid-svg-icons";
 import { Link, useParams } from "react-router-dom";
 import SongList from "../components/SongList";
-import { artistArray } from "../assets/database/artists";
-import { songsArray } from "../assets/database/songs";
+import { useSongsApi } from "../hooks/useSongsApi";
+import { useArtistsApi } from "../hooks/useArtistsApi";
 
 const Artist = () => {
   const { id } = useParams();
-  // console.log(useParams());
+  const { songs, songsLoading } = useSongsApi();
+  const { artists, artistsLoading } = useArtistsApi();
 
-  const { name, banner } = artistArray.filter(
-    (currentArtistObj) => currentArtistObj._id === id
-  )[0];
+  if (songsLoading || artistsLoading || !songs || !artists) {
+    return <div>Carregando...</div>;
+  }
 
-  const songsArrayFromArtist = songsArray.filter(
-    (currentSongObj) => currentSongObj.artist === name
+  const artist = artists.find((currentArtist) => currentArtist._id === id);
+  
+  if (!artist) {
+    return <div>Artista não encontrado</div>;
+  }
+
+  const { name, banner } = artist;
+
+  const songsFromArtist = songs.filter(
+    (currentSong) => currentSong.artist === name
   );
 
-  const randomIndex = Math.floor(
-    Math.random() * (songsArrayFromArtist.length - 1)
-  );
-  const randomIdFromArtist = songsArrayFromArtist[randomIndex]._id;
+  const getRandomSongId = () => {
+    const randomIndex = Math.floor(Math.random() * songsFromArtist.length);
+    return songsFromArtist[randomIndex]?._id;
+  };
 
-  // console.log(randomIdFromArtist);
-  // console.log(Math.floor(Math.random() * (songsArrayFromArtist.length - 1)));
-  // console.log("Tamanho do Array:" + songsArrayFromArtist.length);
+  const randomIdFromArtist = getRandomSongId();
 
-  // console.log(songsArrayFromArtist);
+  if (!randomIdFromArtist) {
+    return <div>Nenhuma música encontrada para este artista</div>;
+  }
 
   return (
     <div className="artist">
@@ -43,7 +52,7 @@ const Artist = () => {
       <div className="artist__body">
         <h2>Populares</h2>
 
-        <SongList songsArray={songsArrayFromArtist} />
+        <SongList songsArray={songsFromArtist} />
       </div>
 
       <Link to={`/song/${randomIdFromArtist}`}>

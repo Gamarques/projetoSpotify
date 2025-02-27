@@ -1,9 +1,16 @@
 import React from "react";
 import ItemList from "./ItemList";
-import { artistArray } from "../assets/database/artists";
-import { songsArray } from "../assets/database/songs";
+import { useSongsApi } from "../hooks/useSongsApi";
+import { useArtistsApi } from "../hooks/useArtistsApi";
 
 const Main = ({ type }) => {
+  const { songs, songsLoading } = useSongsApi();
+  const { artists, artistsLoading } = useArtistsApi();
+
+  if (songsLoading || artistsLoading) {
+    return <div>Carregando...</div>;
+  }
+
   return (
     <div className="main">
       {/* Item List de Artistas */}
@@ -11,7 +18,7 @@ const Main = ({ type }) => {
         <ItemList
           title="Artistas"
           items={10}
-          itemsArray={artistArray}
+          itemsArray={artists}
           path="/artists"
           idPath="/artist"
         />
@@ -24,7 +31,7 @@ const Main = ({ type }) => {
         <ItemList
           title="Músicas"
           items={20}
-          itemsArray={songsArray}
+          itemsArray={songs}
           path="/songs"
           idPath="/song"
         />

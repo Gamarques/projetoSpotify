@@ -1,15 +1,29 @@
-import { useAxios } from 'axios-hooks';
-import { getSongs } from "../services/songsApi";
+import { useState, useEffect } from 'react';
+import api from '../services/api';
 
 export const useSongsApi = () => {
-    const [{ data: songs, loading: songsLoading, error: songsError }, refetchSongs] = useAxios({
-        url: '/songs', // <-  A URL '/songs' é passada aqui para o useAxios
-        method: 'GET'
-      });
+    const [songs, setSongs] = useState(null);
+    const [songsLoading, setSongsLoading] = useState(true);
+    const [songsError, setSongsError] = useState(null);
+
+    useEffect(() => {
+        const fetchSongs = async () => {
+            try {
+                const response = await api.get('/songs');
+                setSongs(response.data);
+                setSongsLoading(false);
+            } catch (error) {
+                setSongsError(error);
+                setSongsLoading(false);
+            }
+        };
+
+        fetchSongs();
+    }, []);
+
     return {
-      songs,
-      songsLoading,
-      songsError,
-      refetchSongs
+        songs,
+        songsLoading,
+        songsError
     };
-  };
+};
