@@ -21,18 +21,53 @@ async function warmupCache() {
 }
 
 async function populateCache(entityName, model, populateOptions = '') {
-    // *** USE O OBJETO cacheKeyMap PARA OBTER A CHAVE DE CACHE DINAMICAMENTE ***
-    const cacheKey = cacheKeyMap[entityName] || entityName; // Tenta obter do mapa, senão usa entityName como fallback
+    const cacheKey = cacheKeyMap[entityName] || entityName;
 
     try {
-        console.log(`populateCache: Buscando dados de ${entityName} do banco de dados (cacheKey: ${cacheKey})...`);
-        const items = await model.find().populate(populateOptions);
-        console.log(`populateCache: Dados de ${entityName} obtidos do banco de dados (cacheKey: ${cacheKey}, primeiros 2 itens):`, items.slice(0, 2).map(item => ({ _id: item._id, name: item.name })));
-        myCache.set(cacheKey, items);
-        console.log(`populateCache: Cache de ${entityName} populado/atualizado (cacheKey: ${cacheKey}).`);
-        return items;
+        console.log(`populateCache: Buscando dados de ${entityName} do banco de dados...`);
+        
+        let items;
+        if (entityName === 'songs') {
+            items = await model.find().populate({
+                path: 'artist',
+                select: 'name' // Selecionando apenas o nome do artista
+            });
+        } else if (entityName === 'artists') {
+            items = await model.find().lean();
+        }
+
+        if (!items) {
+            throw new Error(`Nenhum dado encontrado para ${entityName}`);
+        }
+
+        // Serializa os itens
+        const serializedItems = items.map(item => {
+            if (entityName === 'songs') {
+                const plainItem = item.toObject({ getters: true, virtuals: true });
+                // Substituir o objeto artist pelo nome do artista
+                if (plainItem.artist && plainItem.artist.name) {
+                    plainItem.artist = plainItem.artist.name;
+                }
+                return plainItem;
+            }
+            return item;
+        });
+
+        // Log para debug
+        console.log(`populateCache: Dados de ${entityName} obtidos:`, 
+            serializedItems.slice(0, 2).map(item => ({
+                _id: item._id,
+                name: item.name,
+                ...(entityName === 'songs' ? { artist: item.artist } : {})
+            }))
+        );
+
+        myCache.set(cacheKey, serializedItems);
+        console.log(`populateCache: Cache de ${entityName} atualizado.`);
+        
+        return serializedItems;
     } catch (error) {
-        console.error(`Erro ao popular/atualizar cache de ${entityName} (cacheKey: ${cacheKey}):`, error);
+        console.error(`Erro ao popular cache de ${entityName}:`, error);
         return undefined;
     }
 }
