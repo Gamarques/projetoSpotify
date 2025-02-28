@@ -1774,7 +1774,11 @@ const songSchema = new Schema({
     duration: {
       type: String,
       required: true
-    }
+    },
+    audio: {
+      type: String,
+      required: true
+      },
   }, {
     collection: 'songs2' // Especifica o nome da collection no MongoDB
   });

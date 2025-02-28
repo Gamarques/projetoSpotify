@@ -1,0 +1,13 @@
+arrumar quando entro no artista aparecer SOMENTE as musicas dele
+botao trocar de musica nao reseta o player
+barra do player nao da pra mexer
+plyer: preciso passar via props um array com as musicas que tocarao no player. 
+por ex: Selecionei mc tuto, pega todas as musicas e guarda num aray e ai toca só musicas do mc tuto
+selecionei musicas ai pode puxar todas as musicas da tabela
+opçao do botao shuffle para ativar aleatoridade 
+<!-- <>
+      <div className="player__controllers">
+        <Link to={`/song/${randomIdFromArtist}`}>
+          <FontAwesomeIcon className="player__icon" icon={faBackwardStep} />
+        </Link>
+<> -->
