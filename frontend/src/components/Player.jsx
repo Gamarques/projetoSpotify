@@ -40,6 +40,7 @@ const Player = ({
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(formatTime(0));
   const durationInSeconds = timeInSeconds(duration);
+  const [clickTimeout, setClickTimeout] = useState(null);
 
   // console.log(durationInSeconds);
 
@@ -53,16 +54,35 @@ const Player = ({
     // console.log(formatTime(audioPlayer.current.currentTime));
   };
 
+  const resetProgress = () => {
+    audioPlayer.current.currentTime = 0;
+    progressBar.current.style.setProperty("--_progress", 0 + "%");
+    setCurrentTime(formatTime(0));
+  };
+
+  const handleBackwardClick = () => {
+    if (clickTimeout) {
+      clearTimeout(clickTimeout);
+      setClickTimeout(null);
+      window.location.href = `/song/${randomIdFromArtist}`;
+    } else {
+      setClickTimeout(
+        setTimeout(() => {
+          resetProgress();
+          setClickTimeout(null)
+        }, 300)
+      );
+    }
+  };
+
   useEffect(() => {
     const intervalId = setInterval(() => {
-      if (isPlaying)
+      if (isPlaying) {
         setCurrentTime(formatTime(audioPlayer.current.currentTime));
-
-      progressBar.current.style.setProperty(
-        "--_progress",
-        (audioPlayer.current.currentTime / durationInSeconds) * 100 + "%"
-      );
-    }, 1000);
+        const progress = (audioPlayer.current.currentTime / durationInSeconds) * 100;
+        progressBar.current.style.setProperty("--_progress", `${progress}%`);
+      }
+    }, 50);
 
     return () => clearInterval(intervalId);
   }, [isPlaying]);
@@ -72,14 +92,17 @@ const Player = ({
   return (
     <div className="player">
       <div className="player__controllers">
-        <Link to={`/song/${randomIdFromArtist}`}>
-          <FontAwesomeIcon className="player__icon" icon={faBackwardStep} />
-        </Link>
+        {/* <Link to={`/song/${randomIdFromArtist}`}> */}
+          <FontAwesomeIcon 
+          className="player__icon"
+          onClick= {handleBackwardClick}
+          icon={faBackwardStep} />
+        {/* </Link> */}
 
         <FontAwesomeIcon
           className="player__icon player__icon--play"
           icon={isPlaying ? faCirclePause : faCirclePlay}
-          onClick={() => playPause()}
+          onClick={playPause}
         />
 
         <Link to={`/song/${randomId2FromArtist}`}>
