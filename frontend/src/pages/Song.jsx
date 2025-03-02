@@ -18,9 +18,9 @@ const Song = () => {
     return <div>Música não encontrada</div>;
   }
 
-  const { image, name, duration, artist, audio } = currentSong;
+  const { image, name, duration, artist, audio, artistName } = currentSong;
 
-  const artistObj = artists.find((currentArtist) => currentArtist.name === artist);
+  const artistObj = artists.find((currentArtist) => currentArtist._id === artist);
   if (!artistObj) {
     return <div>Artista não encontrado</div>;
   }
@@ -64,7 +64,7 @@ const Song = () => {
 
         <div>
           <p className="song__name">{name}</p>
-          <p>{artist}</p>
+          <p>{artistName}</p>
         </div>
       </div>
     </div>

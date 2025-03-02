@@ -23,8 +23,9 @@ const Artist = () => {
 
   const { name, banner } = artist;
 
+  // Modificar esta parte para comparar os IDs
   const songsFromArtist = songs.filter(
-    (currentSong) => currentSong.artist === name
+    (currentSong) => currentSong.artist === id
   );
 
   const getRandomSongId = () => {

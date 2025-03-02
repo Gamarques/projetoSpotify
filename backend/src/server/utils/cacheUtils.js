@@ -44,13 +44,15 @@ async function populateCache(entityName, model, populateOptions = '') {
         const serializedItems = items.map(item => {
             if (entityName === 'songs') {
                 const plainItem = item.toObject({ getters: true, virtuals: true });
-                // Mantém o _id do artista ao invés do nome
+                // Mantém tanto o _id quanto o nome do artista
                 if (plainItem.artist) {
-                    plainItem.artist = plainItem.artist._id;
+                    // plainItem.artistId = plainItem.artist._id;
+                    plainItem.artistName = plainItem.artist.name;
+                    plainItem.artist = plainItem.artist._id; // Mantém compatibilidade
                 }
                 return plainItem;
             }
-            return item;
+            return item.toObject ? item.toObject() : item;
         });
 
         // Log para debug
