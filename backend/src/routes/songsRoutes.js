@@ -1,6 +1,7 @@
 import express from 'express';
 import { myCache, populateCache } from '../server/utils/cacheUtils.js'
 import Song from '../models/songs.js';
+import mongoose from 'mongoose';
 
 const router = express.Router();
 
@@ -35,5 +36,36 @@ router.get('/', async (req, res) => {
         return res.status(500).json({ error: 'Falha ao buscar músicas' }); // Retorna erro genérico
     }
 });
+
+router.get('/byArtist/:artistId', async (req, res) => {
+    const artistId = req.params.artistId;
+    const cacheKey = 'songs_list';
+
+    try {
+        const cachedSongs = myCache.get(cacheKey);
+
+        if (!cachedSongs) {
+            return res.status(404).json({ error: 'Músicas não encontradas no cache.  Tente acessar a rota principal "/songs" para popular o cache.' });
+        }
+        const songsByArtist = cachedSongs.filter(song => {
+            if (song.artist && 
+                mongoose.isValidObjectId(song.artist) && 
+                mongoose.isValidObjectId(artistId)) {
+                return song.artist.toString() === artistId.toString();
+            }
+            return false;
+        });
+        
+        if (songsByArtist.length > 0) {
+            return res.json(songsByArtist);
+        } else {
+            return res.status(404).json({ message: 'Nenhuma música encontrada para este artista no cache.' });
+        }
+    } catch (error) {
+        console.error("Erro ao buscar músicas do artista no cache:", error);
+        return res.status(500).json({ error: 'Falha ao buscar músicas do artista' });
+    }
+});
+
 
 export default router;

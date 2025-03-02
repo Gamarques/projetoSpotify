@@ -44,9 +44,9 @@ async function populateCache(entityName, model, populateOptions = '') {
         const serializedItems = items.map(item => {
             if (entityName === 'songs') {
                 const plainItem = item.toObject({ getters: true, virtuals: true });
-                // Substituir o objeto artist pelo nome do artista
-                if (plainItem.artist && plainItem.artist.name) {
-                    plainItem.artist = plainItem.artist.name;
+                // Mantém o _id do artista ao invés do nome
+                if (plainItem.artist) {
+                    plainItem.artist = plainItem.artist._id;
                 }
                 return plainItem;
             }
