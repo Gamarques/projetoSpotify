@@ -60,6 +60,11 @@ const Player = ({
     setCurrentTime(formatTime(0));
   };
 
+  const faForwardClick = () => {
+    resetProgress();
+    window.location.href = `/song/${randomId2FromArtist}`;
+  };
+
   const handleBackwardClick = () => {
     if (clickTimeout) {
       clearTimeout(clickTimeout);
@@ -105,9 +110,10 @@ const Player = ({
           onClick={playPause}
         />
 
-        <Link to={`/song/${randomId2FromArtist}`}>
-          <FontAwesomeIcon className="player__icon" icon={faForwardStep} />
-        </Link>
+          <FontAwesomeIcon 
+          className="player__icon" 
+          icon={faForwardStep} 
+          onClick={faForwardClick}/>
       </div>
 
       <div className="player__progress">

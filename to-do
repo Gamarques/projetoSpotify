@@ -1,9 +1,5 @@
 arrumar quando entro no artista aparecer SOMENTE as musicas dele
-botao trocar de musica nao reseta o player
-barra do player nao da pra mexer
-plyer: preciso passar via props um array com as musicas que tocarao no player. 
-por ex: Selecionei mc tuto, pega todas as musicas e guarda num aray e ai toca só musicas do mc tuto
-selecionei musicas ai pode puxar todas as musicas da tabela
+Verificar no player randomIdFromArtist
 opçao do botao shuffle para ativar aleatoridade 
 <!-- <>
       <div className="player__controllers">
@@ -11,3 +7,147 @@ opçao do botao shuffle para ativar aleatoridade
           <FontAwesomeIcon className="player__icon" icon={faBackwardStep} />
         </Link>
 <> -->
+
+usar slug para camuflar link;
+<!-- ```javascript
+// No seu schema do Mongoose para artistas (artistSchema):
+const mongoose = require('mongoose');
+const slugify = require('slugify'); // Instale: npm install slugify
+
+const artistSchema = new mongoose.Schema({
+    name: { type: String, required: true },
+    image: { type: String },
+    // ... outros campos ...
+    slug: { type: String, unique: true, required: true } // Adicione o campo slug
+});
+
+// Pre-save hook para gerar o slug automaticamente antes de salvar
+artistSchema.pre('save', function(next) {
+    if (!this.isModified('name')) { // Só gera se o nome mudar
+        return next();
+    }
+    this.slug = slugify(this.name, { lower: true }); // Gera o slug
+    next();
+});
+
+const Artist = mongoose.model('Artist', artistSchema);
+module.exports = Artist;
+
+// Na sua rota para buscar o artista por slug (exemplo com Express):
+app.get('/artist/:slug', async (req, res) => {
+    try {
+        const artist = await Artist.findOne({ slug: req.params.slug }); // Busca pelo slug
+        if (!artist) {
+            return res.status(404).send('Artista não encontrado');
+        }
+        res.json(artist);
+    } catch (error) {
+        res.status(500).send(error.message);
+    }
+});
+
+```
+
+2.  **Front-end (React):**
+*   Instale a biblioteca `slugify`:
+   ```bash
+   npm install slugify
+   ```
+*   Use `slugify` para gerar o slug no seu componente, *mas o ideal é usar o slug já vindo do backend*:
+   ```javascript
+   import React from 'react';
+   import { Link } from 'react-router-dom';
+   import slugify from 'slugify';
+
+   const SongBar = ({ artistObj }) => {
+       const artistSlug = artistObj.slug || slugify(artistObj.name, { lower: true }); //usa o slug do backend ou, como fallback, cria um slug
+
+       return (
+           <div className="song__bar">
+               <Link to={`/artist/${artistSlug}`} className="song__artist-image">
+                   <img
+                       width={75}
+                       height={75}
+                       src={artistObj.image}
+                       alt={`Imagem do Artista ${artistObj.name}`}
+                   />
+               </Link>
+               {/* ... */}
+           </div>
+       );
+   };
+
+   export default SongBar;
+   ```
+   *  No seu `App.js` ou onde você define as rotas, use o parâmetro `:slug`:
+   ```javascript
+   import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+   // ... outros imports ...
+   import ArtistPage from './ArtistPage'; // Seu componente para a página do artista
+
+   function App() {
+       return (
+           <Router>
+               <Routes>
+                   <Route path="/artist/:slug" element={<ArtistPage />} />
+                   {/* Outras rotas */}
+               </Routes>
+           </Router>
+       );
+   }
+
+   export default App;
+
+   ```
+
+  *   No componente `ArtistPage`, recupere o artista usando o slug:
+       ```javascript
+       // ArtistPage.jsx
+       import React, { useState, useEffect } from 'react';
+       import { useParams } from 'react-router-dom';
+
+       const ArtistPage = () => {
+           const { slug } = useParams(); // Obtém o slug da URL
+           const [artist, setArtist] = useState(null);
+           const [loading, setLoading] = useState(true);
+
+           useEffect(() => {
+               const fetchArtist = async () => {
+                   try {
+                       const response = await fetch(`/artist/${slug}`); // Faz a requisição para a rota do back-end
+                       if (!response.ok) {
+                           throw new Error(`HTTP error! status: ${response.status}`);
+                       }
+                       const data = await response.json();
+                       setArtist(data);
+                   } catch (error) {
+                       console.error("Erro ao buscar artista:", error);
+                       // Trate o erro (ex: mostrar mensagem de erro)
+                   } finally {
+                       setLoading(false);
+                   }
+               };
+
+               fetchArtist();
+           }, [slug]); // Executa o useEffect sempre que o slug mudar
+
+           if (loading) {
+               return <div>Carregando...</div>;
+           }
+
+           if (!artist) {
+               return <div>Artista não encontrado.</div>;
+           }
+
+           return (
+               <div>
+                   <h1>{artist.name}</h1>
+                   <img src={artist.image} alt={artist.name} />
+                   {/* ... outras informações do artista ... */}
+               </div>
+           );
+       };
+
+       export default ArtistPage;
+
+       ``` -->
