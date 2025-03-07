@@ -1,14 +1,15 @@
 import { useContext } from 'react';
 import { PlaylistContext } from '../contexts/PlaylistContext';
 import { useState, useEffect } from 'react';
+import api from '../services/api';
 
-export const usePlaylist = () => {
-  const context = useContext(PlaylistContext);
-  if (!context) {
-    throw new Error('usePlaylist must be used within a PlaylistProvider');
-  }
-  return context;
-};
+// export const usePlaylist = () => {
+//   const context = useContext(PlaylistContext);
+//   if (!context) {
+//     throw new Error('usePlaylist must be used within a PlaylistProvider');
+//   }
+//   return context;
+// };
 
 
 export const useArtistSongs = (artistId) => {
@@ -19,18 +20,15 @@ export const useArtistSongs = (artistId) => {
     useEffect(() => {
         const fetchSongs = async () => {
             try {
-                const response = await fetch(`/songs/byArtist/${artistId}`);
-                if (!response.ok) {
-                    throw new Error('Erro ao buscar músicas');
-                }
-                const data = await response.json();
-                setSongs(data);
-            } catch (err) {
-                setError(err.message);
-            } finally {
+                const response = await api.get(`/songs/byArtist/${artistId}`);
+                setSongs(response.data);
+                setLoading(false);
+            } catch (error) {
+                setSongsError(error);
                 setLoading(false);
             }
         };
+
 
         if (artistId) {
             fetchSongs();
