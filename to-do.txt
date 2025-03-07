@@ -1,0 +1,9 @@
+Verificar no player randomIdFromArtist
+opçao do botao shuffle para ativar aleatoridade 
+<!-- <>
+      <div className="player__controllers">
+        <Link to={`/song/${randomIdFromArtist}`}>
+          <FontAwesomeIcon className="player__icon" icon={faBackwardStep} />
+        </Link>
+<> -->
+
