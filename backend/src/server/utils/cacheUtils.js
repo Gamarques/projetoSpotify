@@ -55,15 +55,6 @@ async function populateCache(entityName, model, populateOptions = '') {
             return item.toObject ? item.toObject() : item;
         });
 
-        // Log para debug
-        console.log(`populateCache: Dados de ${entityName} obtidos:`, 
-            serializedItems.slice(0, 2).map(item => ({
-                _id: item._id,
-                name: item.name,
-                ...(entityName === 'songs' ? { artist: item.artist } : {})
-            }))
-        );
-
         myCache.set(cacheKey, serializedItems);
         console.log(`populateCache: Cache de ${entityName} atualizado.`);
         
